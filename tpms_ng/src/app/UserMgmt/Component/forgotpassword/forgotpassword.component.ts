@@ -23,10 +23,8 @@ export class ForgotpasswordComponent implements OnInit{
     }
 
   onSubmit() {
-     //alert(this.email)
     this.loginService.sendEmail(this.email).subscribe(
       (response) => {
-        debugger;
         console.log('Email sent successfully:', response);
         const responseObject = JSON.parse(response);
         const status = responseObject?.status;
@@ -38,7 +36,7 @@ export class ForgotpasswordComponent implements OnInit{
         this.router.navigate(['forgotPassword']);
         setTimeout(() => {
           this.errorMessage = '';
-        }, 1000);
+        }, 2000);
         }
         
       },

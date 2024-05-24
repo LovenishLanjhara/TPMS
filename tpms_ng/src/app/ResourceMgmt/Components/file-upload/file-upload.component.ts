@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { UserService } from 'src/app/UserMgmt/Service/user.service';
+import { downloadTemplate, upload, uploadCheck, uploadCheckEmail, uploadCheckPhone, uploadCheckResourceCode } from 'src/app/apiconfig';
 
 
 @Component({
@@ -47,7 +48,7 @@ export class FileUploadComponent {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
     formData.append('allocationDate', formattedDate);
-    this.http.post('http://localhost:9999/tpms/uploadCheck', formData)
+    this.http.post(uploadCheck, formData,{ responseType: 'text'})
     .subscribe(response => {
       console.log('File uploaded successfully', response);
       // Display success message using SweetAlert
@@ -57,6 +58,11 @@ export class FileUploadComponent {
         Swal.fire({
           icon: 'error',
           text: 'Please Upload Excel File in Required Given Format Only.'
+        }).then(function(isConfirm) {
+          // Reload the Page
+          if (isConfirm) {
+          location.reload();
+          }
         });
 
         this.selectedFile = null;
@@ -77,11 +83,149 @@ export class FileUploadComponent {
       this.isUploading = false;
       });
 
+////For Phone Number Check /////////////////////////////////////
+const formattedDate1 = this.datePipe.transform(this.allocationDate, 'yyyy-MM-dd');
+const formData1 = new FormData();
+formData1.append('file', this.selectedFile);
+formData1.append('allocationDate', formattedDate1);
+
+  this.http.post(uploadCheckPhone, formData1,{ responseType: 'text'})
+.subscribe(response => {
+  console.log('File uploaded successfully', response);
+  // Display success message using SweetAlert
+
+  if(!(response=="Sucess"))
+ {
+    Swal.fire({
+      icon: 'error',
+      text: 'Please Remove Duplicate Phone Number:' +response
+    }).then(function(isConfirm) {
+      // Reload the Page
+      if (isConfirm) {
+      location.reload();
+      }
+    });
+
+    this.selectedFile = null;
+    this.allocationDate = null;
+    this.isUploading = false;
+  
+  }else{
+    console.log()
+  }
+
+}, error => {
+  console.error('Error uploading file', error);
+ 
+  Swal.fire({
+    icon: 'error',
+    text: 'Failed to upload file. Please try again later.'
+  });
+
+  this.selectedFile = null;
+  this.allocationDate = null;
+  this.isUploading = false;
+  });
+
+
+///////Check For Email Duplicacy ////////////////////////////////////
+const formattedDate2 = this.datePipe.transform(this.allocationDate, 'yyyy-MM-dd');
+const formData2 = new FormData();
+formData2.append('file', this.selectedFile);
+formData2.append('allocationDate', formattedDate2);
+this.http.post(uploadCheckEmail, formData2,{ responseType: 'text'})
+.subscribe(response => {
+  console.log('File uploaded successfully', response);
+  // Display success message using SweetAlert
+
+  if(!(response=="Sucess"))
+ {
+
+  
+    Swal.fire({
+      icon: 'error',
+      text: 'Please Remove Duplicate Email_ID:' +response
+    }).then(function(isConfirm) {
+      // Reload the Page
+      if (isConfirm) {
+      location.reload();
+      }
+    });
+
+    
+
+    this.selectedFile = null;
+    this.allocationDate = null;
+    this.isUploading = false;
+    
+    
+  }
+  //window.location.reload();
+}, error => {
+  console.error('Error uploading file', error);
+ 
+  Swal.fire({
+    icon: 'error',
+    text: 'Failed to upload file. Please try again later.'
+  });
+
+  this.selectedFile = null;
+  this.allocationDate = null;
+  this.isUploading = false;
+ 
+  });
+
+
+///////Check For Resource Code Duplicacy ////////////////////////////////////
+const formattedDate3 = this.datePipe.transform(this.allocationDate, 'yyyy-MM-dd');
+const formData3 = new FormData();
+formData3.append('file', this.selectedFile);
+formData3.append('allocationDate', formattedDate3);
+this.http.post(uploadCheckResourceCode, formData2,{ responseType: 'text'})
+.subscribe(response => {
+  console.log('File uploaded successfully', response);
+  // Display success message using SweetAlert
+
+  if(!(response=="Sucess"))
+ {
+
+  
+    Swal.fire({
+      icon: 'error',
+      text: 'Please Remove Duplicate Resource Code:' +response
+    }).then(function(isConfirm) {
+      // Reload the Page
+      if (isConfirm) {
+      location.reload();
+      }
+    });
+
+    
+
+    this.selectedFile = null;
+    this.allocationDate = null;
+    this.isUploading = false;
+    
+    
+  }
+  //window.location.reload();
+}, error => {
+  console.error('Error uploading file', error);
+ 
+  Swal.fire({
+    icon: 'error',
+    text: 'Failed to upload file. Please try again later.'
+  });
+
+  this.selectedFile = null;
+  this.allocationDate = null;
+  this.isUploading = false;
+ 
+  });
 
 
 
 
-   
 
   }
  
@@ -116,13 +260,18 @@ export class FileUploadComponent {
       fileFormat = 'Unsupported file type. Please select a .xlsx file.\n';
     }
     
+    if (fileFormat) {
+      Swal.fire( fileFormat);
+      return;
+    }
+
    // this.checkFileFormat(this.selectedFile);
    ////////////////////////////////////////////////////////////
    const formattedDate = this.datePipe.transform(this.allocationDate, 'yyyy-MM-dd');
    const formData = new FormData();
    formData.append('file', this.selectedFile);
    formData.append('allocationDate', formattedDate);
-   this.http.post('http://localhost:9999/tpms/uploadCheck', formData)
+   this.http.post(uploadCheck, formData)
    .subscribe(response => {
      console.log('File uploaded successfully', response);
      // Display success message using SweetAlert
@@ -153,11 +302,7 @@ export class FileUploadComponent {
      });
      ////////////////////////////////////////////////////////////////
 
-    if (fileFormat) {
-      Swal.fire( fileFormat);
-      return;
-    }
-
+  
     Swal.fire({
       title: 'Do you want to upload the file?',
       icon: 'warning',
@@ -171,7 +316,7 @@ export class FileUploadComponent {
     formData.append('file', this.selectedFile);
     formData.append('allocationDate', formattedDate);
 
-    this.http.post('http://localhost:9999/tpms/upload', formData)
+    this.http.post(upload, formData)
       .subscribe(response => {
         console.log('File uploaded successfully', response);
         // Display success message using SweetAlert
@@ -207,7 +352,7 @@ export class FileUploadComponent {
 
 
   downloadTemplate(): void {
-    const templateURL = 'http://localhost:9999/tpms/downloadTemplate'; 
+    const templateURL = downloadTemplate; 
     this.http.get(templateURL, { responseType: 'blob' })
       .subscribe((response: Blob) => {
         const blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -225,24 +370,5 @@ export class FileUploadComponent {
   openDatepicker(): void {
     this.datepicker.show(); 
   } 
-
-  /*checkFileFormat(uploadFile:File):boolean {
-    console.log(uploadFile.name);
-
-    const fileReader = new FileReader();
-    fileReader.onload = (uploadFile) => {
-     const arrayBuffer = uploadFile;
-     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-     console.log(workbook);
-     const firstSheetName = workbook.SheetNames[0];
-     console.log(firstSheetName);
-     const worksheet = workbook.Sheets[firstSheetName];
-     console.log(worksheet);
-     
-    // const headers: string[] = [];
-    }
-    fileReader.readAsArrayBuffer(uploadFile);
-    return true;
-  }*/
 
 }
